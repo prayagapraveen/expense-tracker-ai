@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Flame,
   Loader2,
+  Download,
 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { Navigation } from "@/components/layout/Navigation";
@@ -123,6 +124,26 @@ export default function HomePage() {
 
   const levelInfo = calculateLevel(profile.xp);
 
+  // CSV Export function
+  const exportToCSV = () => {
+    const headers = ["Date", "Category", "Amount", "Description"];
+    const rows = expenses.map((e) => [
+      e.date,
+      e.category,
+      e.amount.toString(),
+      e.description.replace(/,/g, ";"), // Escape commas
+    ]);
+
+    const csvContent = [headers, ...rows].map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `expenses-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -164,6 +185,16 @@ export default function HomePage() {
                 Add expenses naturally, track your spending, and unlock achievements
               </p>
             </motion.div>
+
+            <div className="flex justify-center mb-6">
+              <button
+                onClick={exportToCSV}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-[rgb(var(--card))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--muted))] transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Export Data
+              </button>
+            </div>
 
             <SmartInput />
           </section>
