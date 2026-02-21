@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Flame,
   Loader2,
+  Download,
 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { Navigation } from "@/components/layout/Navigation";
@@ -22,6 +23,7 @@ import { WellnessRing } from "@/components/ui/WellnessRing";
 import { HeatmapCalendar } from "@/components/ui/HeatmapCalendar";
 import { InsightCard } from "@/components/ui/InsightCard";
 import { AchievementPopup } from "@/components/ui/AchievementCard";
+import { ExportModal } from "@/components/ui/ExportModal";
 import { formatCurrency, cn, getStreakEmoji, calculateLevel } from "@/lib/utils";
 import { getCategoryMeta } from "@/types";
 import {
@@ -123,6 +125,9 @@ export default function HomePage() {
 
   const levelInfo = calculateLevel(profile.xp);
 
+  // Export modal state
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -135,6 +140,11 @@ export default function HomePage() {
     <div className="min-h-screen pb-24 lg:pb-8">
       <Navigation />
       <CommandPalette />
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        expenses={expenses}
+      />
 
       {/* Achievement popup */}
       <AnimatePresence>
@@ -415,7 +425,16 @@ export default function HomePage() {
             transition={{ delay: 0.8 }}
             className="p-6 rounded-2xl bg-[rgb(var(--card))] border border-[rgb(var(--border))]"
           >
-            <h3 className="text-lg font-semibold mb-4">Spending Activity</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Spending Activity</h3>
+              <button
+                onClick={() => setIsExportModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-700 text-white transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Export Data
+              </button>
+            </div>
             <HeatmapCalendar expenses={expenses} months={3} />
           </motion.section>
         </div>
