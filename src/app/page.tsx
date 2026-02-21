@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
@@ -13,6 +13,9 @@ import {
   ArrowRight,
   Flame,
   Loader2,
+  Cloud,
+  Zap,
+  Share2,
 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { Navigation } from "@/components/layout/Navigation";
@@ -22,6 +25,7 @@ import { WellnessRing } from "@/components/ui/WellnessRing";
 import { HeatmapCalendar } from "@/components/ui/HeatmapCalendar";
 import { InsightCard } from "@/components/ui/InsightCard";
 import { AchievementPopup } from "@/components/ui/AchievementCard";
+import { CloudExportCenter } from "@/components/ui/CloudExportCenter";
 import { formatCurrency, cn, getStreakEmoji, calculateLevel } from "@/lib/utils";
 import { getCategoryMeta } from "@/types";
 import {
@@ -123,6 +127,9 @@ export default function HomePage() {
 
   const levelInfo = calculateLevel(profile.xp);
 
+  // Cloud Export Center state
+  const [isExportCenterOpen, setIsExportCenterOpen] = useState(false);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -135,6 +142,11 @@ export default function HomePage() {
     <div className="min-h-screen pb-24 lg:pb-8">
       <Navigation />
       <CommandPalette />
+      <CloudExportCenter
+        isOpen={isExportCenterOpen}
+        onClose={() => setIsExportCenterOpen(false)}
+        expenses={expenses}
+      />
 
       {/* Achievement popup */}
       <AnimatePresence>
@@ -417,6 +429,56 @@ export default function HomePage() {
           >
             <h3 className="text-lg font-semibold mb-4">Spending Activity</h3>
             <HeatmapCalendar expenses={expenses} months={3} />
+          </motion.section>
+
+          {/* Cloud Export Center Card */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            onClick={() => setIsExportCenterOpen(true)}
+            className="p-6 rounded-2xl bg-gradient-to-br from-brand-600 via-emerald-600 to-teal-600 cursor-pointer hover:shadow-xl hover:shadow-brand-500/20 transition-all group overflow-hidden relative"
+          >
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <Cloud className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-1">Export Center</h3>
+                  <p className="text-white/80 text-sm">
+                    Cloud sync, share links, scheduled backups & more
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full backdrop-blur-sm">
+                  <Zap className="w-4 h-4 text-yellow-300" />
+                  <span className="text-white text-sm font-medium">2 connected</span>
+                </div>
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                  <Share2 className="w-5 h-5 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Service icons row */}
+            <div className="relative mt-4 flex items-center gap-2">
+              {["📊", "📁", "📦", "☁️", "💬"].map((icon, i) => (
+                <div
+                  key={i}
+                  className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm text-sm"
+                >
+                  {icon}
+                </div>
+              ))}
+              <span className="text-white/60 text-sm ml-2">Google Sheets, Drive, Dropbox & more</span>
+            </div>
           </motion.section>
         </div>
       </main>
